@@ -92,11 +92,13 @@ defmodule Mix.Tasks.Compile.PruMake do
     makefile = Keyword.get(config, :make_makefile, :default)
     targets = Keyword.get(config, :make_targets, [])
 
+    nerves_toolchain = :os.cmd('echo $NERVES_TOOLCHAIN') || "$NERVES_TOOLCHAIN"
+
     env =
       Keyword.get(config, :make_env, %{})
-      |> Map.put("PATH", "\$NERVES_TOOLCHAIN/share/ti-cgt-pru/bin:\$PATH")
-      |> Map.put("PRU_CGT", "\$NERVES_TOOLCHAIN/share/ti-cgt-pru/")
-      |> Map.put("PRU_SSP", "\$NERVES_TOOLCHAIN/share/ti-cgt-pru/usr")
+      |> Map.put("PATH", "#{nerves_toolchain}/share/ti-cgt-pru/bin:$PATH")
+      |> Map.put("PRU_CGT", "#{nerves_toolchain}/share/ti-cgt-pru/")
+      |> Map.put("PRU_SSP", "#{nerves_toolchain}/share/ti-cgt-pru/usr")
 
     # In OTP 19, Erlang's `open_port/2` ignores the current working
     # directory when expanding relative paths. This means that `:make_cwd`
@@ -111,7 +113,7 @@ defmodule Mix.Tasks.Compile.PruMake do
     IO.puts("make exec: #{inspect(exec)}")
     IO.puts("make cwd: #{inspect(cwd)}")
     IO.puts("make args: #{inspect(args)}")
-    IO.puts("make NERVES_TOOLCHAIN: #{:os.cmd('echo $NERVES_TOOLCHAIN')}")
+
 
     for i <- :os.cmd('env') |> to_string() |> String.split("\n"),
         do: IO.puts("make env: #{inspect(i)}")
