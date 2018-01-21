@@ -91,7 +91,11 @@ defmodule Mix.Tasks.Compile.PruMake do
 
     makefile = Keyword.get(config, :make_makefile, :default)
     targets = Keyword.get(config, :make_targets, [])
-    env = Keyword.get(config, :make_env, %{})
+
+    env =
+      Keyword.get(config, :make_env, %{})
+      |> Map.update!("PATH", "$NERVES_TOOLCHAIN/share/ti-cgt-pru/bin:$PATH")
+
     # In OTP 19, Erlang's `open_port/2` ignores the current working
     # directory when expanding relative paths. This means that `:make_cwd`
     # must be an absolute path. This is a different behaviour from earlier
@@ -106,7 +110,8 @@ defmodule Mix.Tasks.Compile.PruMake do
     IO.puts("make cwd: #{inspect(cwd)}")
     IO.puts("make args: #{inspect(args)}")
 
-    for i <- :os.cmd('env') |> to_string() |> String.split("\n"), do: IO.puts("make env: #{inspect(i)}")
+    for i <- :os.cmd('env') |> to_string() |> String.split("\n"),
+        do: IO.puts("make env: #{inspect(i)}")
 
     case cmd(exec, args, cwd, env, "--verbose" in task_args) do
       0 ->
