@@ -99,6 +99,9 @@ defmodule Mix.Tasks.Compile.PruMake do
 
     args = args_for_makefile(exec, makefile) ++ targets
 
+    IO.puts "make exec: #{inspect exec}"
+    IO.puts "make cwd: #{inspect cwd}"
+    IO.puts "make args: #{inspect args}"
     case cmd(exec, args, cwd, env, "--verbose" in task_args) do
       0 ->
         :ok
