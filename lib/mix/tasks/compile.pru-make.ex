@@ -95,6 +95,7 @@ defmodule Mix.Tasks.Compile.PruMake do
     env =
       Keyword.get(config, :make_env, %{})
       |> Map.put("PATH", "$NERVES_TOOLCHAIN/share/ti-cgt-pru/bin:$PATH")
+      |> Map.put("PRU_CGT", "$NERVES_TOOLCHAIN/share/ti-cgt-pru/")
 
     # In OTP 19, Erlang's `open_port/2` ignores the current working
     # directory when expanding relative paths. This means that `:make_cwd`
