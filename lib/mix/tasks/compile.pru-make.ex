@@ -106,7 +106,7 @@ defmodule Mix.Tasks.Compile.PruMake do
     IO.puts("make cwd: #{inspect(cwd)}")
     IO.puts("make args: #{inspect(args)}")
 
-    for i <- :os.cmd('env') |> String.split("\n"), do: IO.puts("make env: #{inspect(i)}")
+    for i <- :os.cmd('env') |> to_string() |> String.split("\n"), do: IO.puts("make env: #{inspect(i)}")
 
     case cmd(exec, args, cwd, env, "--verbose" in task_args) do
       0 ->
