@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Compile.ElixirMake do
+defmodule Mix.Tasks.Compile.PruMake do
   use Mix.Task
 
   @recursive true
