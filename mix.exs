@@ -6,7 +6,7 @@ defmodule NervesPruIcss.MixProject do
       app: :nerves_pru_icss,
       version: "0.1.0",
       elixir: "~> 1.6",
-      build_embedded: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       description: "A wrapper for compiler TI's PRU C/C++ Compiler",
       deps: deps()
