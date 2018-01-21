@@ -92,7 +92,7 @@ defmodule Mix.Tasks.Compile.PruMake do
     makefile = Keyword.get(config, :make_makefile, :default)
     targets = Keyword.get(config, :make_targets, [])
 
-    nerves_toolchain = :os.cmd('echo $NERVES_TOOLCHAIN') || "$NERVES_TOOLCHAIN"
+    nerves_toolchain = :os.cmd('echo $NERVES_TOOLCHAIN') |> String.trim || "$NERVES_TOOLCHAIN"
 
     env =
       Keyword.get(config, :make_env, %{})
