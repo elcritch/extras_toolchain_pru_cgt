@@ -64,7 +64,7 @@ defmodule Mix.Tasks.Compile.PruMake do
 
   @spec run(OptionParser.argv()) :: :ok | no_return
   def run(args) do
-    config = Mix.Project.config()
+    config = Mix.Project.config() |> Keyword.get(:nerves_pru, [])
     Mix.shell().print_app()
     build(config, args)
     Mix.Project.build_structure()
@@ -74,38 +74,32 @@ defmodule Mix.Tasks.Compile.PruMake do
   # This is called by Elixir when `mix clean` is run and `:elixir_make` is in
   # the list of compilers.
   def clean() do
-    config = Mix.Project.config()
-    {clean_targets, config} = Keyword.pop(config, :make_clean)
+    config = Mix.Project.config() |> Keyword.get(:nerves_pru, [])
+    #{clean_targets, config} = Keyword.pop(config, :pru_clean)
 
-    if clean_targets do
-      config
-      |> Keyword.put(:make_targets, clean_targets)
-      |> build([])
-    end
+    #if clean_targets do
+    #  config
+    #  |> Keyword.put(:pru_targets, clean_targets)
+    #  |> build([])
+    #end
   end
 
   defp build(config, task_args) do
     exec =
-      System.get_env("MAKE") ||
-        os_specific_executable(Keyword.get(config, :make_executable, :default))
+      System.get_env("PRU_CC") ||
+        executable(Keyword.get(config, :pru_cc, :default))
 
-    makefile = Keyword.get(config, :make_makefile, :default)
-    targets = Keyword.get(config, :make_targets, [])
+    targets = Keyword.get(config, :pru_targets, [])
 
-    nerves_toolchain = :os.cmd('echo $NERVES_TOOLCHAIN') |> to_string() |> String.trim || "$NERVES_TOOLCHAIN"
+    toolchain = System.get_env("NERVES_TOOLCHAIN") 
 
     env =
-      Keyword.get(config, :make_env, %{})
-      |> Map.put("PATH", "#{nerves_toolchain}/share/ti-cgt-pru/bin:$PATH")
-      |> Map.put("PRU_CGT", "#{nerves_toolchain}/share/ti-cgt-pru/")
-      |> Map.put("PRU_SSP", "#{nerves_toolchain}/../build/host-pru-software-support-v5.1.0")
+      Keyword.get(config, :pru_env, %{})
+      |> Map.put("PATH", "#{toolchain}/share/ti-cgt-pru/bin:$PATH")
+      |> Map.put("PRU_CGT", "#{toolchain}/share/ti-cgt-pru/")
+      |> Map.put("PRU_SSP", "#{toolchain}/../build/host-pru-software-support-v5.1.0")
 
-    # In OTP 19, Erlang's `open_port/2` ignores the current working
-    # directory when expanding relative paths. This means that `:make_cwd`
-    # must be an absolute path. This is a different behaviour from earlier
-    # OTP versions and appears to be a bug. It is being tracked at
-    # http://bugs.erlang.org/browse/ERL-175.
-    cwd = Keyword.get(config, :make_cwd, ".") |> Path.expand(File.cwd!())
+    cwd = Keyword.get(config, :pru_cwd, ".") |> Path.expand(File.cwd!())
     error_msg = Keyword.get(config, :make_error_message, :default) |> os_specific_error_msg()
 
     args = args_for_makefile(exec, makefile) ++ targets
@@ -153,25 +147,14 @@ defmodule Mix.Tasks.Compile.PruMake do
   end
 
   defp raise_build_error(exec, exit_status, error_msg) do
-    Mix.raise(~s{Could not compile with "#{exec}" (exit status: #{exit_status}).\n} <> error_msg)
+    Mix.raise "Could not compile with `#{exec}`` (exit status: #{exit_status}).\n" <> error_msg
   end
 
-  defp os_specific_executable(exec) when is_binary(exec) do
-    exec
-  end
+  defp executable(exec) when is_binary(exec), do: exec
 
-  defp os_specific_executable(:default) do
-    case :os.type() do
-      {:win32, _} ->
-        "nmake"
+  defp executable(:application), do: @cross_compiler
 
-      {:unix, type} when type in [:freebsd, :openbsd] ->
-        "gmake"
-
-      _ ->
-        "make"
-    end
-  end
+  defp executable(:firmware), do: @ti_cgt_pru
 
   defp os_specific_error_msg(msg) when is_binary(msg) do
     msg
