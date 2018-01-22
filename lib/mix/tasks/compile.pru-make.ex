@@ -4,54 +4,7 @@ defmodule Mix.Tasks.Compile.PruMake do
   @recursive true
 
   @moduledoc """
-  Runs `make` in the current project.
-
-  This task runs `make` in the current project; any output coming from `make` is
-  printed in real-time on stdout.
-
-  ## Configuration
-
-  This compiler can be configured through the return value of the `project/0`
-  function in `mix.exs`; for example:
-
-      def project() do
-        [app: :myapp,
-         make_executable: "make",
-         make_makefile: "Othermakefile",
-         compilers: [:elixir_make] ++ Mix.compilers,
-         deps: deps()]
-      end
-
-  The following options are available:
-
-    * `:make_executable` - (binary or `:default`) it's the executable to use as the
-      `make` program. If not provided or if `:default`, it defaults to `"nmake"`
-      on Windows, `"gmake"` on FreeBSD and OpenBSD, and `"make"` on everything
-      else. You can, for example, customize which executable to use on a
-      specific OS and use `:default` for every other OS. If the `MAKE`
-      environment variable is present, that is used as the value of this option.
-
-    * `:make_makefile` - (binary or `:default`) it's the Makefile to
-      use. Defaults to `"Makefile"` for Unix systems and `"Makefile.win"` for
-      Windows systems if not provided or if `:default`.
-
-    * `:make_targets` - (list of binaries) it's the list of Make targets that
-      should be run. Defaults to `[]`, meaning `make` will run the first target.
-
-    * `:make_clean` - (list of binaries) it's a list of Make targets to be run
-      when `mix clean` is run. It's only run if a non-`nil` value for
-      `:make_clean` is provided. Defaults to `nil`.
-
-    * `:make_cwd` - (binary) it's the directory where `make` will be run,
-      relative to the root of the project.
-
-    * `:make_env` - (map of binary to binary) it's a map of extra environment
-      variables to be passed to `make`.
-
-    * `:make_error_message` - (binary or `:default`) it's a custom error message
-      that can be used to give instructions as of how to fix the error (e.g., it
-      can be used to suggest installing `gcc` if you're compiling a C
-      dependency).
+  Compiles PRU firmware code in the current project.
 
   """
 
@@ -84,45 +37,81 @@ defmodule Mix.Tasks.Compile.PruMake do
     #end
   end
 
+  @pru_compiler_args %{
+    linker_command_file: "./#{args.src}/AM335x_PRU.cmd",
+    libs: ~w{--library=#{args.ssp}/lib/rpmsg_lib.lib},
+    include: ~w{--include_path=#{args.ssp}/include --include_path=#{args.ssp}/include/am335x --include_path=../../../firmware/include"},
+
+    #Common compiler and linker flags (Defined in 'PRU Optimizing C/C++ Compiler User's Guide)
+    cflags: ~w{-v3 -O2 --display_error_number --endian=little --hardware_mac=on -ppd -ppa},  # --obj_directory=$(GEN_DIR) --pp_directory=$(GEN_DIR)
+
+    #Linker flags (Defined in 'PRU Optimizing C/C++ Compiler User's Guide)
+    lflags: ~w{--reread_libs --warn_sections --stack_size=0x100 --heap_size=0x100},
+  }
+
+  # Returns a list of command-line args to pass to make (or nmake/gmake) in
+  # order to specify the makefile to use.
+  defp compiler_args(:pru_cc, args) do
+    args = Map.merge args, @pru_compiler_args
+
+    ~w"""
+      $(PRU_CGT)/bin/clpru --include_path=$(PRU_CGT)/include $(INCLUDE) $(CFLAGS) -fe $@ $<
+      """
+  end
+  defp compiler_args(:pru_linker, args) do
+    args = Map.merge args, @pru_compiler_args
+
+    ~w"""
+      #{args.cgt}/bin/clpru #{args.cflags} -z -i#{args.cgt}/lib -i#{args.cgt}/include #{args.lflags} -o $(TARGET) $(OBJECTS) -m#{args.map} #{args.linker_command_file} --library=#{args.cgt}/lib/libc.a #{args.libs}
+      """
+  end
+  defp compiler_args(:gnu_cross, _) do
+    %{}
+  end
+
   defp build(config, task_args) do
-    exec =
-      System.get_env("PRU_CC") ||
-        executable(Keyword.get(config, :pru_cc, :default))
 
-    targets = Keyword.get(config, :pru_targets, [])
+    # hardcode nerves requirement (for now at least)
+    toolchain =
+      Keyword.get(config, :toolchain_path) ||
+        System.get_env("NERVES_TOOLCHAIN") ||
+          Mix.raise "Could not find Nerves Toolchain Path in system environment.\n"
 
-    toolchain = System.get_env("NERVES_TOOLCHAIN") 
+    pru_cgt = Keyword.get(config, :pru_cgt_path) || "#{toolchain}/share/ti-cgt-pru/")
+    pru_ssp = Keyword.get(config, :pru_ssp_path) || "#{toolchain}/../build/host-pru-software-support-v5.1.0/")
 
     env =
       Keyword.get(config, :pru_env, %{})
-      |> Map.put("PATH", "#{toolchain}/share/ti-cgt-pru/bin:$PATH")
-      |> Map.put("PRU_CGT", "#{toolchain}/share/ti-cgt-pru/")
-      |> Map.put("PRU_SSP", "#{toolchain}/../build/host-pru-software-support-v5.1.0")
+      |> Map.put_new("PATH", "#{pru_cgt}/bin:$PATH")
+
+    pru_cc =
+      System.get_env("PRU_CC") ||
+        Keyword.get(config, :pru_cc, "clpru")
 
     cwd = Keyword.get(config, :pru_cwd, ".") |> Path.expand(File.cwd!())
-    error_msg = Keyword.get(config, :make_error_message, :default) |> os_specific_error_msg()
 
-    args = args_for_makefile(exec, makefile) ++ targets
+    compiler_config = %{cc: pru_cc, cgt: pru_cgt, ssp: pru_ssp, env: env, toolchain: toolchain}
+    args = compiler_args(:pru_cc, compiler_config)
 
-    IO.puts("make exec: #{inspect(exec)}")
+    targets = Keyword.get(config, :pru_targets, [])
+
+    IO.puts("make pru_cc: #{inspect(pru_cc)}")
     IO.puts("make cwd: #{inspect(cwd)}")
     IO.puts("make args: #{inspect(args)}")
 
-    for i <- :os.cmd('env') |> to_string() |> String.split("\n"),
-        do: IO.puts("make env: #{inspect(i)}")
+    # for i <- :os.cmd('env') |> to_string() |> String.split("\n"),
+    #     do: IO.puts("make env: #{inspect(i)}")
 
-    case cmd(exec, args, cwd, env, "--verbose" in task_args) do
-      0 ->
-        :ok
-
-      exit_status ->
-        raise_build_error(exec, exit_status, error_msg)
+    for target <- targets do
+      run_cmd(pru_cc, args, cwd, env, "--verbose" in task_args)
     end
+
+    :ok
   end
 
   # Runs `exec [args]` in `cwd` and prints the stdout and stderr in real time,
   # as soon as `exec` prints them (using `IO.Stream`).
-  defp cmd(exec, args, cwd, env, verbose?) do
+  defp run_cmd(exec, args, target, cwd, env, verbose?) do
     opts = [
       into: IO.stream(:stdio, :line),
       stderr_to_stdout: true,
@@ -135,7 +124,14 @@ defmodule Mix.Tasks.Compile.PruMake do
     end
 
     {%IO.Stream{}, status} = System.cmd(find_executable(exec), args, opts)
-    status
+
+    case status do
+      0 ->
+        :ok
+
+      exit_status ->
+        raise_build_error(exec, exit_status, "error compiling: #{inspect target}")
+    end
   end
 
   defp find_executable(exec) do
@@ -150,29 +146,11 @@ defmodule Mix.Tasks.Compile.PruMake do
     Mix.raise "Could not compile with `#{exec}`` (exit status: #{exit_status}).\n" <> error_msg
   end
 
-  defp executable(exec) when is_binary(exec), do: exec
-
-  defp executable(:application), do: @cross_compiler
-
-  defp executable(:firmware), do: @ti_cgt_pru
-
-  defp os_specific_error_msg(msg) when is_binary(msg) do
-    msg
-  end
-
-  defp os_specific_error_msg(:default) do
-    case :os.type() do
-      {:unix, _} -> @unix_error_msg
-      _ -> "unknown os error: #{:os.type()}"
-    end
-  end
-
-  # Returns a list of command-line args to pass to make (or nmake/gmake) in
-  # order to specify the makefile to use.
-  # defp args_for_makefile("nmake", :default), do: ["/F", "Makefile.win"]
-  # defp args_for_makefile("nmake", makefile), do: ["/F", makefile]
-  defp args_for_makefile(_, :default), do: []
-  defp args_for_makefile(_, makefile), do: ["-f", makefile]
+  # defp executable(exec) when is_binary(exec), do: exec
+  #
+  # defp executable(:application), do: @cross_compiler
+  #
+  # defp executable(:firmware), do: @ti_cgt_pru
 
   defp print_verbose_info(exec, args) do
     args =
