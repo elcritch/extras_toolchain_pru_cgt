@@ -28,70 +28,70 @@ defmodule Mix.Tasks.Compile.PruMake do
   # the list of compilers.
   def clean() do
     config = Mix.Project.config() |> Keyword.get(:nerves_pru, [])
-    #{clean_targets, config} = Keyword.pop(config, :pru_clean)
+    # {clean_targets, config} = Keyword.pop(config, :pru_clean)
 
-    #if clean_targets do
+    # if clean_targets do
     #  config
     #  |> Keyword.put(:pru_targets, clean_targets)
     #  |> build([])
-    #end
+    # end
   end
 
   @pru_compiler_args %{
-    linker_command_file: "./#{args.src}/AM335x_PRU.cmd",
-    libs: ~w{--library=#{args.ssp}/lib/rpmsg_lib.lib},
-    include: ~w{--include_path=#{args.ssp}/include --include_path=#{args.ssp}/include/am335x --include_path=../../../firmware/include"},
+    default_ld_cmd_file: "${LINKER_COMMAND_FILE:-./firmware/AM335x_PRU.cmd}",
+    libs: ~w'--library=${PRU_SSP}/lib/rpmsg_lib.lib',
+    include:
+      ~w'--include_path=${PRU_SSP}/include --include_path=${PRU_SSP}/include/am335x --include_path=../../../firmware/include"',
 
-    #Common compiler and linker flags (Defined in 'PRU Optimizing C/C++ Compiler User's Guide)
-    cflags: ~w{-v3 -O2 --display_error_number --endian=little --hardware_mac=on -ppd -ppa},  # --obj_directory=$(GEN_DIR) --pp_directory=$(GEN_DIR)
+    # Common compiler and linker flags (Defined in 'PRU Optimizing C/C++ Compiler User's Guide)
+    # --obj_directory=$(GEN_DIR) --pp_directory=$(GEN_DIR)
+    cflags: ~w'-v3 -O2 --display_error_number --endian=little --hardware_mac=on -ppd -ppa',
 
-    #Linker flags (Defined in 'PRU Optimizing C/C++ Compiler User's Guide)
-    lflags: ~w{--reread_libs --warn_sections --stack_size=0x100 --heap_size=0x100},
+    # Linker flags (Defined in 'PRU Optimizing C/C++ Compiler User's Guide)
+    lflags: ~w'--reread_libs --warn_sections --stack_size=0x100 --heap_size=0x100'
   }
 
   # Returns a list of command-line args to pass to make (or nmake/gmake) in
   # order to specify the makefile to use.
-  defp compiler_args(:pru_cc, args) do
-    args = Map.merge args, @pru_compiler_args
-
-    ~w"""
-      $(PRU_CGT)/bin/clpru --include_path=$(PRU_CGT)/include $(INCLUDE) $(CFLAGS) -fe $@ $<
-      """
+  defp compiler_args(:pru_cc) do
+    """
+    ${PRU_CGT}/bin/clpru --include_path=${PRU_CGT}/include ${INCLUDE} ${CFLAGS} -fe ${source} ${target}
+    """
   end
-  defp compiler_args(:pru_linker, args) do
-    args = Map.merge args, @pru_compiler_args
-
-    ~w"""
-      #{args.cgt}/bin/clpru #{args.cflags} -z -i#{args.cgt}/lib -i#{args.cgt}/include #{args.lflags} -o $(TARGET) $(OBJECTS) -m#{args.map} #{args.linker_command_file} --library=#{args.cgt}/lib/libc.a #{args.libs}
-      """
+  defp compiler_args(:pru_linker) do
+    """
+    ${CGT}/bin/clpru ${CFLAGS} -z -i${CGT}/lib -i${CGT}/include ${LFLAGS}
+        -o ${TARGET) ${OBJECTS)
+        -m${MAP} ${LINKER_COMMAND_FILE:-$DEFAULT_LD_CMD_FILE} --library=${CGT}/lib/libc.a
+        ${EXTRA_LIBS}
+    """
   end
-  defp compiler_args(:gnu_cross, _) do
+  defp compiler_args(:gnu_cross) do
     %{}
   end
 
   defp build(config, task_args) do
-
     # hardcode nerves requirement (for now at least)
     toolchain =
-      Keyword.get(config, :toolchain_path) ||
-        System.get_env("NERVES_TOOLCHAIN") ||
-          Mix.raise "Could not find Nerves Toolchain Path in system environment.\n"
+      Keyword.get(config, :toolchain_path) || System.get_env("NERVES_TOOLCHAIN") ||
+        Mix.raise("Could not find Nerves Toolchain Path in system environment.\n")
 
-    pru_cgt = Keyword.get(config, :pru_cgt_path) || "#{toolchain}/share/ti-cgt-pru/")
-    pru_ssp = Keyword.get(config, :pru_ssp_path) || "#{toolchain}/../build/host-pru-software-support-v5.1.0/")
+    pru_cgt = Keyword.get(config, :pru_cgt_path) || "#{toolchain}/share/ti-cgt-pru/"
+
+    pru_ssp =
+      Keyword.get(config, :pru_ssp_path) ||
+        "#{toolchain}/../build/host-pru-software-support-v5.1.0/"
 
     env =
       Keyword.get(config, :pru_env, %{})
       |> Map.put_new("PATH", "#{pru_cgt}/bin:$PATH")
 
-    pru_cc =
-      System.get_env("PRU_CC") ||
-        Keyword.get(config, :pru_cc, "clpru")
+    pru_cc = System.get_env("PRU_CC") || Keyword.get(config, :pru_cc, "clpru")
 
     cwd = Keyword.get(config, :pru_cwd, ".") |> Path.expand(File.cwd!())
 
     compiler_config = %{cc: pru_cc, cgt: pru_cgt, ssp: pru_ssp, env: env, toolchain: toolchain}
-    args = compiler_args(:pru_cc, compiler_config)
+    args = compiler_args(:pru_cc) |> load_compiler_args(compiler_config)
 
     targets = Keyword.get(config, :pru_targets, [])
 
@@ -103,7 +103,7 @@ defmodule Mix.Tasks.Compile.PruMake do
     #     do: IO.puts("make env: #{inspect(i)}")
 
     for target <- targets do
-      run_cmd(pru_cc, args, cwd, env, "--verbose" in task_args)
+      run_cmd(pru_cc, args, target, cwd, env, "--verbose" in task_args)
     end
 
     :ok
@@ -130,8 +130,16 @@ defmodule Mix.Tasks.Compile.PruMake do
         :ok
 
       exit_status ->
-        raise_build_error(exec, exit_status, "error compiling: #{inspect target}")
+        raise_build_error(exec, exit_status, "error compiling: #{inspect(target)}")
     end
+  end
+
+  defp load_compiler_args(template, args) do
+    args = Map.merge(args, @pru_compiler_args)
+
+    template
+    |> String.replace(~r/[\n\t ]+/, " ")
+    |> ShellTemplate.format(args, upcase: true)
   end
 
   defp find_executable(exec) do
@@ -143,7 +151,7 @@ defmodule Mix.Tasks.Compile.PruMake do
   end
 
   defp raise_build_error(exec, exit_status, error_msg) do
-    Mix.raise "Could not compile with `#{exec}`` (exit status: #{exit_status}).\n" <> error_msg
+    Mix.raise("Could not compile with `#{exec}`` (exit status: #{exit_status}).\n" <> error_msg)
   end
 
   # defp executable(exec) when is_binary(exec), do: exec

@@ -1,0 +1,5 @@
+%{
+  "mustache": {:hex, :mustache, "0.3.1", "4c6ee79b13aae954035fe31b83c94480ddc7b536d09c44d4c65e61a9ead38d6b", [:mix], [], "hexpm"},
+  "neotomex": {:hex, :neotomex, "0.1.7", "64f76513653aa87ea7abdde0fd600e56955d838020a13d88f2bf334c88ac3e7a", [:mix], [], "hexpm"},
+  "shell_template": {:git, "https://github.com/elcritch/shell_template.git", "ec30d53d9bdffec2f384db7a9db1d09f75545afa", []},
+}
