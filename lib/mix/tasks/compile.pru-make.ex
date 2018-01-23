@@ -38,72 +38,85 @@ defmodule Mix.Tasks.Compile.PruMake do
   end
 
   @pru_compiler_args %{
-    default_ld_cmd_file: "${LINKER_COMMAND_FILE:-./firmware/AM335x_PRU.cmd}",
-    libs: ~w'--library=${PRU_SSP}/lib/rpmsg_lib.lib',
-    include:
-      ~w'--include_path=${PRU_SSP}/include --include_path=${PRU_SSP}/include/am335x --include_path=../../../firmware/include"',
+    DEFAULT_LD_CMD_FILE: "${LINKER_COMMAND_FILE:-./firmware/AM335x_PRU.cmd}",
+    LIBS: ~w'--library=${PRU_SSP}/lib/rpmsg_lib.lib',
+    INCLUDES: [
+      "--include_path=${PRU_SSP}/include",
+      "--include_path=${PRU_SSP}/include/am335x",
+      "--include_path=../../../firmware/include"
+    ],
 
     # Common compiler and linker flags (Defined in 'PRU Optimizing C/C++ Compiler User's Guide)
     # --obj_directory=$(GEN_DIR) --pp_directory=$(GEN_DIR)
-    cflags: ~w'-v3 -O2 --display_error_number --endian=little --hardware_mac=on -ppd -ppa',
+    CFLAGS: ~w'-v3 -O2 --display_error_number --endian=little --hardware_mac=on -ppd -ppa',
 
     # Linker flags (Defined in 'PRU Optimizing C/C++ Compiler User's Guide)
-    lflags: ~w'--reread_libs --warn_sections --stack_size=0x100 --heap_size=0x100'
+    LFLAGS: ~w'--reread_libs --warn_sections --stack_size=0x100 --heap_size=0x100'
   }
 
   # Returns a list of command-line args to pass to make (or nmake/gmake) in
   # order to specify the makefile to use.
   defp compiler_args(:pru_cc) do
     """
-    ${PRU_CGT}/bin/clpru --include_path=${PRU_CGT}/include ${INCLUDE} ${CFLAGS} -fe ${source} ${target}
+    ${CGT}${PRU_CC} --include_path=${PRU_CGT}/include ${INCLUDES} ${CFLAGS} -fe ${source} ${target}
     """
   end
+
   defp compiler_args(:pru_linker) do
     """
-    ${CGT}/bin/clpru ${CFLAGS} -z -i${CGT}/lib -i${CGT}/include ${LFLAGS}
+    ${CGT}${PRU_CC} ${CFLAGS} -z -i${CGT}/lib -i${CGT}/include ${LFLAGS}
         -o ${TARGET) ${OBJECTS)
         -m${MAP} ${LINKER_COMMAND_FILE:-$DEFAULT_LD_CMD_FILE} --library=${CGT}/lib/libc.a
         ${EXTRA_LIBS}
     """
   end
+
   defp compiler_args(:gnu_cross) do
-    %{}
+    """
+    """
+  end
+
+  defp compiler_env(build_config) do
+    # hardcode nerves requirement (for now at least)
+    toolchain =
+      Keyword.get(build_config, :toolchain_path) || System.get_env("NERVES_TOOLCHAIN") ||
+        Mix.raise("Could not find Nerves Toolchain Path in system environment.\n")
+
+    pru_cc = System.get_env("PRU_CC")
+
+    pru_cgt = Keyword.get(build_config, :pru_cgt_path) || "#{toolchain}/share/ti-cgt-pru/"
+
+    pru_ssp =
+      Keyword.get(build_config, :pru_ssp_path) ||
+        "#{toolchain}/../build/host-pru-software-support-v5.1.0/"
+
+    %{
+      cc: pru_cc,
+      cgt: pru_cgt,
+      ssp: pru_ssp,
+      toolchain: toolchain
+    }
   end
 
   defp build(config, task_args) do
-    # hardcode nerves requirement (for now at least)
-    toolchain =
-      Keyword.get(config, :toolchain_path) || System.get_env("NERVES_TOOLCHAIN") ||
-        Mix.raise("Could not find Nerves Toolchain Path in system environment.\n")
-
-    pru_cgt = Keyword.get(config, :pru_cgt_path) || "#{toolchain}/share/ti-cgt-pru/"
-
-    pru_ssp =
-      Keyword.get(config, :pru_ssp_path) ||
-        "#{toolchain}/../build/host-pru-software-support-v5.1.0/"
-
     env =
       Keyword.get(config, :pru_env, %{})
-      |> Map.put_new("PATH", "#{pru_cgt}/bin:$PATH")
+      |> Map.put_new("PATH", "${PRU_CGT}/bin:$$PATH")
 
-    pru_cc = System.get_env("PRU_CC") || Keyword.get(config, :pru_cc, "clpru")
-
+    compiler_config = compiler_env(config)
     cwd = Keyword.get(config, :pru_cwd, ".") |> Path.expand(File.cwd!())
 
-    compiler_config = %{cc: pru_cc, cgt: pru_cgt, ssp: pru_ssp, env: env, toolchain: toolchain}
-    args = compiler_args(:pru_cc) |> load_compiler_args(compiler_config)
+    [cc_cmd | args ] = compiler_args(:pru_cc) |> load_compiler_args(compiler_config)
 
     targets = Keyword.get(config, :pru_targets, [])
 
-    IO.puts("make pru_cc: #{inspect(pru_cc)}")
-    IO.puts("make cwd: #{inspect(cwd)}")
-    IO.puts("make args: #{inspect(args)}")
+    IO.puts("make cwd: #{inspect(cwd)} args: #{inspect(args)} compiler_config: #{inspect compiler_config}")
 
     # for i <- :os.cmd('env') |> to_string() |> String.split("\n"),
     #     do: IO.puts("make env: #{inspect(i)}")
 
     for target <- targets do
-      run_cmd(pru_cc, args, target, cwd, env, "--verbose" in task_args)
+      run_cmd(cc_cmd, args, target, cwd, env, "--verbose" in task_args)
     end
 
     :ok
@@ -138,8 +151,8 @@ defmodule Mix.Tasks.Compile.PruMake do
     args = Map.merge(args, @pru_compiler_args)
 
     template
-    |> String.replace(~r/[\n\t ]+/, " ")
-    |> ShellTemplate.format(args, upcase: true)
+    |> String.split()
+    |> Enum.map( &ShellTemplate.format(&1, args, upcase: true) )
   end
 
   defp find_executable(exec) do
