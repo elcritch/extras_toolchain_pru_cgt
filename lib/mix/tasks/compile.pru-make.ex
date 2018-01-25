@@ -153,7 +153,7 @@ defmodule Mix.Tasks.Compile.PruMake do
   end
 
   defp raise_build_error(exec, exit_status, error_msg) do
-    Mix.raise(~s{Could not compile with "#{exec}" (exit status: #{exit_status}).\n} <> error_msg)
+    Mix.raise(~s'Could not compile with "#{exec}" (exit status: #{exit_status}).\n' <> error_msg)
   end
 
   defp os_specific_executable(exec) when is_binary(exec) do
