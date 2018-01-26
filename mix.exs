@@ -18,6 +18,7 @@ defmodule NervesPruIcss.MixProject do
 
   def nerves_package do
     [
+      name: "nerves_pru_icss",
       type: :extras,
       platform: Nerves.Toolchain.CTNG,
       platform_config: [
