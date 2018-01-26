@@ -6,6 +6,7 @@ defmodule NervesPruIcss.MixProject do
       app: :nerves_pru_icss,
       version: "0.1.0",
       elixir: "~> 1.6",
+      nerves_package: nerves_package(),
       compilers: [:nerves_package | Mix.compilers()],
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
