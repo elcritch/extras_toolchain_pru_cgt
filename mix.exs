@@ -21,7 +21,7 @@ defmodule NervesPruIcss.MixProject do
     [
       name: :nerves_pru_icss,
       type: :extras,
-      platform: Nerves.Toolchain.CTNG,
+      platform: Nerves.System.BR,
       platform_config: [
       ],
       target_tuple: :arm_unknown_linux_gnueabihf,
