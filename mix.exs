@@ -4,6 +4,7 @@ defmodule NervesPruIcss.MixProject do
   def project do
     [
       app: :nerves_pru_icss,
+      name: "PruCGT",
       version: "0.1.0",
       elixir: "~> 1.6",
       nerves_package: nerves_package(),
