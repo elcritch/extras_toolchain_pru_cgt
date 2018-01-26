@@ -17,7 +17,7 @@ defmodule NervesPruIcss do
   end
 end
 
-defmodule Nerves.Toolchain.CTNG do
+defmodule Nerves.Toolchain.Extra do
   use Nerves.Package.Platform
 
   alias Nerves.Artifact
