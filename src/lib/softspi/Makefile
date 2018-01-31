@@ -29,7 +29,7 @@ MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
 PROJ_NAME=$(CURRENT_DIR)
 #-----------------------------------
-INCLUDE=--include_path=../../../include
+INCLUDE=--include_path=../../priv/../include
 #-----------------------------------
 GEN_DIR=gen
 
@@ -60,7 +60,7 @@ $(TARGET): $(OBJECTS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: PRU Archiver'
 	$(PRU_CGT)/bin/arpru r $(TARGET) $(OBJECTS)
-	@cp $(TARGET) ../../$(PROJ_NAME).lib
+	@cp $(TARGET) ../../priv/$(PROJ_NAME).lib
 	@echo 'Finished building target: $@'
 	@echo ''
 	@echo 'Output files can be found in the "$(GEN_DIR)" directory'
@@ -83,7 +83,7 @@ clean:
 	@echo ''
 	@echo 'Removing files in the "$(GEN_DIR)" directory'
 	@rm -rf $(GEN_DIR)
-	@rm -rf ../../$(PROJ_NAME).lib
+	@rm -rf ../../priv/$(PROJ_NAME).lib
 	@echo ''
 	@echo 'Finished cleaning project: $(PROJ_NAME)'
 	@echo '************************************************************'
