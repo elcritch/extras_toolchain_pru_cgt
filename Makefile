@@ -1,4 +1,4 @@
-SUBDIRS = src/lib/rpmsg_lib src/lib/pru_support_lib src/lib/msgpack_lib
+SUBDIRS = src/lib/rpmsg src/lib/pru_support src/lib/msgpack
 
 all: $(SUBDIRS)
 
