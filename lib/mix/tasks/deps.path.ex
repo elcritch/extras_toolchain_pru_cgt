@@ -3,6 +3,7 @@ defmodule Mix.Tasks.Nerves.Path.Dep do
 
   @shortdoc "Print the path for a given dependency "
   def run([dep]) do
+    IO.puts "HELLOOO"
     value = Map.get(Mix.Project.deps_paths, String.to_atom(dep)) || ''
     IO.puts "#{value}"
   end
@@ -15,6 +16,7 @@ defmodule Mix.Tasks.Nerves.Path.Artifact do
 
   @shortdoc "Print the path for a given nerves artifact "
   def run([dep]) do
+    IO.puts "WORLDDDD"
 
     Nerves.Env.start
     Nerves.Env.ensure_loaded(Mix.Project.config[:app])
