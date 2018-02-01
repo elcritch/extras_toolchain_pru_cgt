@@ -10,7 +10,8 @@ defmodule Mix.Tasks.Nerves.Path.Dep do
   end
 end
 
-defmodule Mix.Tasks.Nerves.Path.Artifact do
+# defmodule Mix.Tasks.Nerves.Path.Artifact do
+defmodule Mix.Tasks.Deps.Path do
   use Mix.Task
 
   @shortdoc "Print the path for a given nerves artifact "
