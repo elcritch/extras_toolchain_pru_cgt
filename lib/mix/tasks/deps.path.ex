@@ -16,6 +16,9 @@ defmodule Mix.Tasks.Nerves.Path.Artifact do
   @shortdoc "Print the path for a given nerves artifact "
   def run([dep]) do
 
+    try do
+    System.put_env("NERVES_ENV_DISABLED", "1")
+
     Nerves.Env.start
     Nerves.Env.ensure_loaded(Mix.Project.config[:app])
 
@@ -27,6 +30,11 @@ defmodule Mix.Tasks.Nerves.Path.Artifact do
       nerves_package ->
         # IO.puts "#{inspect nerves_package}"
         IO.puts "#{Nerves.Artifact.dir nerves_package}"
+    end
+
+    rescue
+      error ->
+        Mix.raise "error: #{inspect error}"
     end
   end
 
