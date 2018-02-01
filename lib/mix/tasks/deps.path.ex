@@ -15,7 +15,7 @@ defmodule Mix.Tasks.Nerves.Path.Artifact do
 
   @shortdoc "Print the path for a given nerves artifact "
   def run([dep]) do
-    dep_paths = Nerves.Env.packages() |> Enum.map(fn d -> {d.app, d.path} end) |> Map.new
+    dep_paths = Nerves.Env.packages() |> Enum.map(fn d -> {d.app, d} end) |> Map.new
 
     case Map.get(dep_paths, String.to_atom(dep)) do
       nil ->
