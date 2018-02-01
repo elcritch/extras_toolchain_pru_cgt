@@ -4,7 +4,7 @@ defmodule Mix.Tasks.Nerves.Path.Dep do
   @shortdoc "Print the path for a given dependency "
   def run([dep]) do
     value = Map.get(Mix.Project.deps_paths, String.to_atom(dep)) || ''
-    IO.puts "#{dep |> String.upcase}=\"#{value}\""
+    IO.puts "#{value}"
   end
   def run(_) do
   end
@@ -17,7 +17,7 @@ defmodule Mix.Tasks.Nerves.Path.Artifact do
   def run([dep]) do
     dep_paths = Nerves.Env.packages() |> Enum.map(fn d -> {d.app, d.path} end) |> Map.new
     value = Map.get(dep_paths, String.to_atom(dep)) || ''
-    IO.puts "#{dep |> String.upcase}=\"#{value}\""
+    IO.puts "#{value}"
   end
   def run(_) do
   end
