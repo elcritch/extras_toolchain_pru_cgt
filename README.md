@@ -1,4 +1,4 @@
-# NervesPruIcss
+# extras_toolchain_pru_cgt
 
 **TODO: Add description**
 
@@ -10,7 +10,7 @@ by adding `nerves_pru_icss` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:nerves_pru_icss, "~> 0.1.0"}
+    {:extras_toolchain_pru_cgt, "~> 0.1", git: "https://github.com/elcritch/extras_toolchain_pru_cgt.git", branch: "v0.1.x"},
   ]
 end
 ```
