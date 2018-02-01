@@ -2,14 +2,11 @@ defmodule Mix.Tasks.Build.Env do
   use Mix.Task
 
   @shortdoc "Simply runs the Hello.say/0 command."
-  def run(arg) do
-    # calling our Hello.say() function from earlier
+  def run([dep]) do
     IO.puts "build:env: #{inspect arg}"
-    case arg do
-      [dep] ->
-        IO.puts Map.get(Mix.Project.deps_paths, String.to_atom(dep))
-      _ ->
-        nil
-    end
+    value = Map.get(Mix.Project.deps_paths, String.to_atom(dep)) || ''
+    IO.puts "#{dep |> String.upcase}='#{value}'"
+  end
+  def run(_) do
   end
 end
