@@ -1,9 +1,11 @@
 defmodule NervesPruIcss.MixProject do
   use Mix.Project
 
+  @app :nerves_pru_icss
+
   def project do
     [
-      app: :nerves_pru_icss,
+      app: @app,
       name: "PruCGT",
       version: "0.1.0",
       elixir: "~> 1.6",
