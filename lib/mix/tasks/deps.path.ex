@@ -7,7 +7,7 @@ defmodule Mix.Tasks.Build.Env do
     IO.puts "build:env: #{inspect arg}"
     case arg do
       [dep] ->
-        IO.puts Map.get(Mix.Project.deps_paths, dep)
+        IO.puts Map.get(Mix.Project.deps_paths, String.to_atom(dep))
       _ ->
         nil
     end
