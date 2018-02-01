@@ -13,6 +13,7 @@ defmodule NervesPruIcss.MixProject do
       start_permanent: Mix.env() == :prod,
       description: "A wrapper for compiler TI's PRU C/C++ Compiler",
       deps: deps(),
+      package: package(),
       aliases: ["deps.precompile": ["nerves.env", "deps.precompile"]]
     ]
   end
