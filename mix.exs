@@ -41,7 +41,8 @@ defmodule NervesPruIcss.MixProject do
 
   defp deps do
     [
-      {:nerves, "~> 0.9", runtime: false},
+      {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "master", override: true },
+      # {:nerves, "~> 0.9", runtime: false},
     ]
   end
 
