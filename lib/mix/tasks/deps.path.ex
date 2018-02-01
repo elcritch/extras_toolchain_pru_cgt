@@ -21,7 +21,7 @@ defmodule Mix.Tasks.Nerves.Path.Artifact do
       nil ->
         IO.puts ""
       nerves_package ->
-        IO.puts "#{inspect nerves_package}"
+        # IO.puts "#{inspect nerves_package}"
         IO.puts "#{Nerves.Artifact.dir nerves_package}"
     end
   end
