@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Deps.Get do
+defmodule Mix.Tasks.Paths.Get do
   use Mix.Task
 
   @shortdoc "Simply runs the Hello.say/0 command."
