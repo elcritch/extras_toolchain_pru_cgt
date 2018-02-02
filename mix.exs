@@ -1,7 +1,7 @@
 defmodule NervesPruIcss.MixProject do
   use Mix.Project
 
-  @app :extras_toolchain_pru_cgt
+  @app :toolchain_extras_pru_cgt
 
   def project do
     [
@@ -23,13 +23,13 @@ defmodule NervesPruIcss.MixProject do
   def nerves_package do
     [
       name: @app,
-      type: :extras,
-      platform: Nerves.Toolchain.Extra,
+      type: :extras_toolchain,
+      platform: Nerves.Toolchain.Extras,
       platform_config: [
       ],
       target_tuple: :arm_unknown_linux_gnueabihf,
       artifact_sites: [
-        {:github_releases, "elcritch/extras_toolchain_pru_cgt"}
+        {:github_releases, "elcritch/#{@app}"}
       ],
       checksum: package_files()
     ]
@@ -41,7 +41,8 @@ defmodule NervesPruIcss.MixProject do
 
   defp deps do
     [
-      {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "master", override: true },
+      # {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "master", override: true },
+      {:nerves, git: "https://github.com/nerves-project/nerves.git", branch: "host_tools", override: true },
       # {:nerves, "~> 0.9", runtime: false},
     ]
   end
@@ -61,7 +62,7 @@ defmodule NervesPruIcss.MixProject do
       "README.md",
       "LICENSE",
       "mix.exs",
-      "VERSION"
+      "lib",
     ]
   end
 
