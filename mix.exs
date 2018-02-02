@@ -23,6 +23,11 @@ defmodule NervesPruIcss.MixProject do
       name: @app,
       type: :extras_toolchain,
       platform: Nerves.System.ToolchainExtras,
+      toolchain_extras: [
+        build_path_link: "ti-cgt-pru",
+        build_script: "build.sh",
+        clean_files: [ "ti-cgt-pru" ],
+      ],
       platform_config: [
       ],
       target_tuple: :arm_unknown_linux_gnueabihf,
