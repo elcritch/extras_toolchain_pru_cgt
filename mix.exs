@@ -11,8 +11,6 @@ defmodule NervesPruIcss.MixProject do
       elixir: "~> 1.4",
       nerves_package: nerves_package(),
       compilers: [:nerves_package | Mix.compilers()],
-      build_embedded: Mix.env() == :prod,
-      start_permanent: Mix.env() == :prod,
       description: "A wrapper for compiler TI's PRU C/C++ Compiler",
       deps: deps(),
       package: package(),
@@ -24,7 +22,7 @@ defmodule NervesPruIcss.MixProject do
     [
       name: @app,
       type: :extras_toolchain,
-      platform: Nerves.Toolchain.Extras,
+      platform: Nerves.Toolchain.Extras.PruCGT,
       platform_config: [
       ],
       target_tuple: :arm_unknown_linux_gnueabihf,
