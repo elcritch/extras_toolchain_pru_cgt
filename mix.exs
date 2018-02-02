@@ -22,7 +22,7 @@ defmodule NervesPruIcss.MixProject do
     [
       name: @app,
       type: :extras_toolchain,
-      platform: Nerves.System.Extras,
+      platform: Nerves.System.ToolchainExtras,
       platform_config: [
       ],
       target_tuple: :arm_unknown_linux_gnueabihf,
@@ -39,8 +39,8 @@ defmodule NervesPruIcss.MixProject do
 
   defp deps do
     [
-      # {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "master", override: true },
-      {:nerves, git: "https://github.com/nerves-project/nerves.git", branch: "host_tools", override: true },
+      {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "host_tools_fork", override: true },
+      # {:nerves, git: "https://github.com/nerves-project/nerves.git", branch: "host_tools", override: true },
       # {:nerves, "~> 0.9", runtime: false},
     ]
   end
