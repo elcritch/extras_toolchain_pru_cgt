@@ -22,7 +22,7 @@ defmodule NervesPruIcss.MixProject do
     [
       name: @app,
       type: :extras_toolchain,
-      platform: Nerves.Toolchain.Extras.PruCGT,
+      platform: Nerves.System.Extras,
       platform_config: [
       ],
       target_tuple: :arm_unknown_linux_gnueabihf,
