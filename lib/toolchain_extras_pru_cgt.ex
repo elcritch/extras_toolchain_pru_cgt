@@ -20,7 +20,7 @@ defmodule Nerves.Toolchain.Extras.PruCGT do
     #File.rm_rf!(build_path)
     #File.mkdir_p!(build_path)
 
-    IO.puts "extras.prucgt:build: toolchain: #{inspect _toolchain}, opts: #{inspect opts}"
+    IO.puts "extras.prucgt:build: toolchain: #{inspect _toolchain}, opts: #{inspect _opts}"
 
     script = 
       :nerves_toolchain_ctng
