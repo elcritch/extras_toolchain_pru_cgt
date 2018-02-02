@@ -1,4 +1,4 @@
 %{
   "distillery": {:hex, :distillery, "1.5.2", "eec18b2d37b55b0bcb670cf2bcf64228ed38ce8b046bb30a9b636a6f5a4c0080", [:mix], [], "hexpm"},
-  "nerves": {:git, "https://github.com/elcritch/nerves.git", "940ccac7736c553d9917be21d665c3cfbad2ddd8", [branch: "host_tools_fork"]},
+  "nerves": {:git, "https://github.com/elcritch/nerves.git", "72f6d0db5d4a0a33472a5c56388cdf7555a71ddb", [branch: "host_tools_fork"]},
 }
