@@ -8,6 +8,7 @@ defmodule Nerves.Toolchain.Extras.PruCGT do
   Called as the last step of bootstrapping the Nerves env.
   """
   def bootstrap(%{path: path}) do
+    IO.puts "bootsrapping extras.prucgt ... #{inspect path}"
     System.put_env("PRU_CGT", path)
     :ok
   end
