@@ -20,7 +20,7 @@ defmodule Nerves.Toolchain.Extras.PruCGT do
     #File.rm_rf!(build_path)
     #File.mkdir_p!(build_path)
 
-    IO.puts "extras.prucgt:build: toolchain: #{insepct _toolchain}, opts: #{inspect opts}"
+    IO.puts "extras.prucgt:build: toolchain: #{inspect _toolchain}, opts: #{inspect opts}"
 
     script = 
       :nerves_toolchain_ctng
@@ -59,7 +59,7 @@ defmodule Nerves.Toolchain.Extras.PruCGT do
   def archive(pkg, _toolchain, _opts) do
     build_path = Artifact.build_path(pkg)
 
-    IO.puts "extras.prucgt:archive: toolchain: #{insepct _toolchain}, opts: #{inspect opts}"
+    IO.puts "extras.prucgt:archive: toolchain: #{inspect _toolchain}, opts: #{inspect opts}"
     1
     script =
       :nerves_toolchain_ctng
