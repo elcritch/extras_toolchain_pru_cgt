@@ -23,6 +23,7 @@ defmodule NervesPruIcss.MixProject do
       name: @app,
       type: :extras_toolchain,
       platform: Nerves.System.ToolchainExtras,
+      platform: Nerves.Toolchain.Extras,
       toolchain_extras: [
         env_var: "PRU_CGT",
         build_path_link: "ti-cgt-pru",
@@ -45,7 +46,8 @@ defmodule NervesPruIcss.MixProject do
 
   defp deps do
     [
-      {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "host_tools_fork", override: true },
+      {:toolchain_extras, github: "elcritch/toolchain_extras", branch: "master"}
+      # {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "host_tools_fork", override: true },
       # {:nerves, git: "https://github.com/nerves-project/nerves.git", branch: "host_tools", override: true },
       # {:nerves, "~> 0.9", runtime: false},
     ]
