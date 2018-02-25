@@ -1,4 +1,3 @@
-
 defmodule NervesExtras.Toolchain do
   use Nerves.Package.Platform
 
@@ -18,7 +17,7 @@ defmodule NervesExtras.Toolchain do
   Called as the last step of bootstrapping the Nerves env.
   """
   def bootstrap(%{config: config} = pkg) do
-    IO.puts "extras:bootsrapping: pkg: #{inspect pkg}"
+    IO.puts("extras:bootsrapping: pkg: #{inspect(pkg)}")
 
     if Keyword.has_key?(config[:toolchain_extras], :boostrap_override) do
       boot_func = config[:toolchain_extras][:boostrap_override]
@@ -35,8 +34,8 @@ defmodule NervesExtras.Toolchain do
 
     env_var = pkg.config[:toolchain_extras][:env_var]
 
-    IO.puts "extras:bootsrapping: build_path: #{inspect artifact_path}"
-    IO.puts "extras:bootsrapping: put_env: envvar: #{inspect env_var}"
+    IO.puts("extras:bootsrapping: build_path: #{inspect(artifact_path)}")
+    IO.puts("extras:bootsrapping: put_env: envvar: #{inspect(env_var)}")
 
     System.put_env(env_var, artifact_path)
     :ok
@@ -48,13 +47,13 @@ defmodule NervesExtras.Toolchain do
   Return the location in the build path to where the global artifact is linked
   """
   def build_path_link(pkg) do
-    IO.puts "extras:build_path_link: pkg: #{inspect pkg}"
+    IO.puts("extras:build_path_link: pkg: #{inspect(pkg)}")
 
     path_link = pkg.config[:build_path_link] || ""
     build_path = Artifact.build_path(pkg) || ""
 
     path = Path.join(build_path, path_link)
-    IO.inspect path, label: :extras_build_path_link
+    IO.inspect(path, label: :extras_build_path_link)
   end
 
   def build(pkg, _toolchain, _opts) do
@@ -66,7 +65,7 @@ defmodule NervesExtras.Toolchain do
     |> Path.join("file")
     |> File.touch()
 
-    IO.puts "EXTRAS_BUILD: pkg: #{inspect Artifact.name(pkg)} build_path: #{build_path}"
+    IO.puts("EXTRAS_BUILD: pkg: #{inspect(Artifact.name(pkg))} build_path: #{build_path}")
     {:ok, build_path}
   end
 
@@ -75,14 +74,14 @@ defmodule NervesExtras.Toolchain do
   """
   def archive(pkg, _toolchain, _opts) do
     build_path = Artifact.build_path(pkg)
-    
-    script = 
+
+    script =
       :nerves_toolchain_ctng
       |> Nerves.Env.package()
       |> Map.get(:path)
       |> Path.join("scripts")
       |> Path.join("archive.sh")
-    
+
     tar_path = Path.join([build_path, Artifact.download_name(pkg) <> Artifact.ext(pkg)])
 
     case shell(script, [build_path, tar_path]) do
@@ -107,6 +106,6 @@ defmodule NervesExtras.Toolchain do
     pkg.config
     |> Keyword.get(:platform_config)
     |> Keyword.get(:defconfig)
-    |> Path.expand
+    |> Path.expand()
   end
 end
