@@ -1,7 +1,7 @@
 
 defmodule NervesExtras.Toolchain do
   import Nerves.Package.Platform
-  @behavior Nerves.Package.Platform
+  @behaviour Nerves.Package.Platform
 
   alias Nerves.Artifact
   import Mix.Nerves.Utils
