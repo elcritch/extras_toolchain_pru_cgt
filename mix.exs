@@ -10,7 +10,7 @@ defmodule NervesPruIcss.MixProject do
       version: "0.3.0",
       elixir: "~> 1.4",
       nerves_package: nerves_package(),
-      compilers: [:nerves_package, :host_tool ] ++ Mix.compilers(),
+      compilers: [:nerves_package ] ++ Mix.compilers(),
       description: "A wrapper for compiler TI's PRU C/C++ Compiler",
       deps: deps(),
       package: package(),
