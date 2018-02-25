@@ -14,7 +14,7 @@ defmodule NervesPruIcss.MixProject do
       description: "A wrapper for compiler TI's PRU C/C++ Compiler",
       deps: deps(),
       package: package(),
-      aliases: ["deps.precompile": ["nerves.env", "deps.precompile"]]
+      aliases: [loadconfig: [&bootstrap/1]],
     ]
   end
 
@@ -45,9 +45,9 @@ defmodule NervesPruIcss.MixProject do
 
   defp deps do
     [
-      {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "host_tools_fork", override: true },
+      # {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "host_tools_fork", override: true },
       # {:nerves, git: "https://github.com/nerves-project/nerves.git", branch: "host_tools", override: true },
-      # {:nerves, "~> 0.9", runtime: false},
+      {:nerves, "~> 1.0.0-rc", runtime: false},
     ]
   end
 
@@ -69,5 +69,12 @@ defmodule NervesPruIcss.MixProject do
       # "lib",
     ]
   end
+
+
+  defp bootstrap(args) do
+    Application.start(:nerves_bootstrap)
+    Mix.Task.run("loadconfig", args)
+  end
+
 
 end
