@@ -58,4 +58,16 @@ defmodule NervesExtras.Toolchain do
     IO.inspect path, label: :extras_build_path_link
   end
 
+  def build(pkg, _toolchain, _opts) do
+    build_path = Artifact.build_path(pkg)
+    File.rm_rf!(build_path)
+    File.mkdir_p!(build_path)
+
+    build_path
+    |> Path.join("file")
+    |> File.touch()
+
+    IO.puts "extras_build: pkg: #{inspect Artifact.name(pkg)} build_path: #{build_path}"
+    {:ok, build_path}
+  end
 end
