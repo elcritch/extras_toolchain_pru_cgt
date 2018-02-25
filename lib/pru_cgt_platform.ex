@@ -1,5 +1,5 @@
 
-defmodule NervesPruIcss.Toolchain do
+defmodule NervesExtras.Toolchain do
   import Nerves.Package.Platform
   @behavior Nerves.Package.Platform
 
