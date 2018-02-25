@@ -69,4 +69,44 @@ defmodule NervesExtras.Toolchain do
     IO.puts "EXTRAS_BUILD: pkg: #{inspect Artifact.name(pkg)} build_path: #{build_path}"
     {:ok, build_path}
   end
+
+  @doc """
+  Create an archive of the artifact
+  """
+  def archive(pkg, _toolchain, _opts) do
+    build_path = Artifact.build_path(pkg)
+    
+    script = 
+      :nerves_toolchain_ctng
+      |> Nerves.Env.package()
+      |> Map.get(:path)
+      |> Path.join("scripts")
+      |> Path.join("archive.sh")
+    
+    tar_path = Path.join([build_path, Artifact.download_name(pkg) <> Artifact.ext(pkg)])
+
+    case shell(script, [build_path, tar_path]) do
+      {_, 0} -> {:ok, tar_path}
+      {error, _} -> {:error, error}
+    end
+  end
+
+  @doc """
+  Clean up all the build files
+  """
+  def clean(pkg) do
+    dmg = Artifact.name(pkg) <> ".dmg"
+    File.rm(dmg)
+
+    pkg
+    |> Artifact.dir()
+    |> File.rm_rf()
+  end
+
+  defp defconfig(pkg) do
+    pkg.config
+    |> Keyword.get(:platform_config)
+    |> Keyword.get(:defconfig)
+    |> Path.expand
+  end
 end
