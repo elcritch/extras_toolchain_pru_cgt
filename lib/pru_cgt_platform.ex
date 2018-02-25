@@ -67,7 +67,7 @@ defmodule NervesExtras.Toolchain do
     |> Path.join("file")
     |> File.touch()
 
-    IO.puts "extras_build: pkg: #{inspect Artifact.name(pkg)} build_path: #{build_path}"
+    IO.puts "EXTRAS_BUILD: pkg: #{inspect Artifact.name(pkg)} build_path: #{build_path}"
     {:ok, build_path}
   end
 end
