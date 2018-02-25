@@ -7,7 +7,7 @@ defmodule NervesPruIcss.MixProject do
     [
       app: @app,
       name: "PruCGT",
-      version: "0.2.0",
+      version: "0.3.0",
       elixir: "~> 1.4",
       nerves_package: nerves_package(),
       compilers: [:nerves_package | Mix.compilers()],
@@ -22,7 +22,7 @@ defmodule NervesPruIcss.MixProject do
     [
       name: @app,
       type: :extras_toolchain,
-      platform: Nerves.System.ToolchainExtras,
+      platform: Nerves.PruCGT.Toolchain,
       toolchain_extras: [
         env_var: "PRU_CGT",
         build_path_link: "ti-cgt-pru",
