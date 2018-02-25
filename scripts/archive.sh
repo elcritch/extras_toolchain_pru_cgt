@@ -28,7 +28,7 @@ echo Building archive...
 # Assemble the tarball for the toolchain
 TARGET_TUPLE=ti-cgt-pru_${CGT_VERSION}/
 TAR_PATH="${TARBALL_PATH}"
-TOOLCHAIN_BASE_NAME=$(basename ${TARBALL_PATH%.*.*})
+TOOLCHAIN_BASE_NAME="$(basename ${TARBALL_PATH%.*.*})/"
 
 mkdir -p $WORK_DIR
 cd "$WORK_DIR"
