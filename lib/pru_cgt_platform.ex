@@ -76,8 +76,7 @@ defmodule NervesExtras.Toolchain do
     build_path = Artifact.build_path(pkg)
 
     script =
-      :nerves_toolchain_ctng
-      |> Nerves.Env.package()
+      pkg
       |> Map.get(:path)
       |> Path.join("scripts")
       |> Path.join("archive.sh")

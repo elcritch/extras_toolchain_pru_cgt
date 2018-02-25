@@ -7,7 +7,7 @@ defmodule NervesPruIcss.MixProject do
     [
       app: @app,
       name: "PruCGT",
-      version: "0.3.0",
+      version: "2.2.1",
       elixir: "~> 1.4",
       nerves_package: nerves_package(),
       compilers: [:nerves_package] ++ Mix.compilers(),
@@ -28,7 +28,8 @@ defmodule NervesPruIcss.MixProject do
         env_var: "PRU_CGT",
         build_path_link: "ti-cgt-pru",
         build_script: "build.sh",
-        clean_files: ["ti-cgt-pru"]
+        clean_files: ["ti-cgt-pru"],
+        archive_script: "scripts/archive.sh",
       ],
       platform_config: [],
       target_tuple: :arm_unknown_linux_gnueabihf,
