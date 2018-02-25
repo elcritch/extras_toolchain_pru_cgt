@@ -74,6 +74,7 @@ defmodule NervesPruIcss.MixProject do
 
   defp bootstrap(args) do
     IO.puts "BOOTSTRAP: PRU_CGT"
+    System.put_env("MIX_TARGET", "CC")
     Application.start(:nerves_bootstrap)
     Mix.Task.run("loadconfig", args)
   end
