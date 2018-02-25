@@ -9,13 +9,13 @@ defmodule NervesPruIcss.MixProject do
       name: "PruCGT",
       version: "2.2.1",
       elixir: "~> 1.4",
-      nerves_package: nerves_package(),
       compilers: [:nerves_package] ++ Mix.compilers(),
+      nerves_package: nerves_package(),
       description: "A wrapper for compiler TI's PRU C/C++ Compiler",
       deps: deps(),
       package: package(),
-      # aliases: ["deps.precompile": ["nerves.env", "deps.precompile"]]
-      aliases: [loadconfig: [&bootstrap/1]]
+      aliases: ["deps.precompile": ["nerves.env", "deps.precompile"],
+                loadconfig: [&bootstrap/1]]
     ]
   end
 
@@ -48,7 +48,8 @@ defmodule NervesPruIcss.MixProject do
     [
       # {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "host_tools_fork", override: true },
       # {:nerves, git: "https://github.com/nerves-project/nerves.git", branch: "host_tools", override: true },
-      {:nerves, "~> 1.0.0-rc", runtime: false}
+      {:nerves, "~> 1.0.0-rc", runtime: false},
+      {:toolchain_extras, "~> 0.1", github: "elcritch/toolchain_extras", runtime: false}
     ]
   end
 
@@ -72,7 +73,7 @@ defmodule NervesPruIcss.MixProject do
 
   defp bootstrap(args) do
     IO.puts("BOOTSTRAP: PRU_CGT")
-    System.put_env("MIX_TARGET", "CC")
+    # System.put_env("MIX_TARGET", "CC")
     Application.start(:nerves_bootstrap)
     Mix.Task.run("loadconfig", args)
   end
