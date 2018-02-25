@@ -1,6 +1,7 @@
 
-defmodule Nerves.System.ToolchainExtras do
-  use Nerves.Package.Platform
+defmodule NervesPruIcss.Toolchain do
+  import Nerves.Package.Platform
+  @behavior Nerves.Package.Platform
 
   alias Nerves.Artifact
   import Mix.Nerves.Utils
