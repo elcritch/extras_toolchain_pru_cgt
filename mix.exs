@@ -23,7 +23,7 @@ defmodule NervesPruIcss.MixProject do
     [
       name: @app,
       type: :extras_toolchain,
-      platform: Nerves.PruCGT.Toolchain,
+      platform: NervesPruIcss.Toolchain,
       toolchain_extras: [
         env_var: "PRU_CGT",
         build_path_link: "ti-cgt-pru",
