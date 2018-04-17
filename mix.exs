@@ -7,7 +7,7 @@ defmodule NervesPruIcss.MixProject do
     [
       app: @app,
       name: "PruCGT",
-      version: "2.2.1",
+      version: "2.2.2",
       elixir: "~> 1.4",
       compilers: [:nerves_package] ++ Mix.compilers(),
       nerves_package: nerves_package(),
