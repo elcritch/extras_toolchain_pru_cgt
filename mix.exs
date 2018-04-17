@@ -48,7 +48,7 @@ defmodule NervesPruIcss.MixProject do
     [
       # {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "host_tools_fork", override: true },
       # {:nerves, git: "https://github.com/nerves-project/nerves.git", branch: "host_tools", override: true },
-      {:nerves, "~> 1.0.0-rc", runtime: false},
+      {:nerves, "~> 1.0.0-rc.1", runtime: false},
       {:toolchain_extras, "~> 0.1", github: "elcritch/toolchain_extras", runtime: false}
     ]
   end
