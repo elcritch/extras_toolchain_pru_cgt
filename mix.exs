@@ -14,7 +14,8 @@ defmodule NervesPruIcss.MixProject do
       description: "A wrapper for compiler TI's PRU C/C++ Compiler",
       deps: deps(),
       package: package(),
-      aliases: ["deps.precompile": ["nerves.env", "deps.precompile"], loadconfig: [&bootstrap/1]]
+      # aliases: ["deps.precompile": ["nerves.env", "deps.precompile"], loadconfig: [&bootstrap/1]]
+      aliases: [loadconfig: [&bootstrap/1]],
     ]
   end
 
