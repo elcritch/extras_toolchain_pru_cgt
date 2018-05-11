@@ -46,8 +46,6 @@ defmodule NervesPruIcss.MixProject do
 
   defp deps do
     [
-      # {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "host_tools_fork", override: true },
-      # {:nerves, git: "https://github.com/nerves-project/nerves.git", branch: "host_tools", override: true },
       {:nerves, "~> 1.0", runtime: false},
       {:toolchain_extras, "~> 0.2", github: "elcritch/toolchain_extras", runtime: false}
     ]
@@ -72,8 +70,6 @@ defmodule NervesPruIcss.MixProject do
   end
 
   defp bootstrap(args) do
-    IO.puts("BOOTSTRAP: PRU_CGT")
-    # System.put_env("MIX_TARGET", "CC")
     Application.start(:nerves_bootstrap)
     Mix.Task.run("loadconfig", args)
   end
