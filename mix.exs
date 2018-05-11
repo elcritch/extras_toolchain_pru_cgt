@@ -47,7 +47,8 @@ defmodule NervesPruIcss.MixProject do
   defp deps do
     [
       {:nerves, "~> 1.0", runtime: false},
-      {:toolchain_extras, "~> 0.2", runtime: false}
+      {:toolchain_extras, "~> 0.2", runtime: false},
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 
