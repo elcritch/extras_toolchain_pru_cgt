@@ -66,6 +66,7 @@ defmodule NervesPruIcss.MixProject do
       "LICENSE"
       "mix.exs",
       "lib",
+      "config",
     ]
   end
 
