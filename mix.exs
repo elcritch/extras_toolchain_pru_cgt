@@ -64,7 +64,7 @@ defmodule NervesPruIcss.MixProject do
 
   defp package_files do
     [
-      # "README.md",
+      "README.md",
       "LICENSE"
       "mix.exs",
       "lib",
