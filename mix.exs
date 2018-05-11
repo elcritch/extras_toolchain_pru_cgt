@@ -14,8 +14,7 @@ defmodule NervesPruIcss.MixProject do
       description: "A wrapper for compiler TI's PRU C/C++ Compiler",
       deps: deps(),
       package: package(),
-      aliases: ["deps.precompile": ["nerves.env", "deps.precompile"],
-                loadconfig: [&bootstrap/1]]
+      aliases: ["deps.precompile": ["nerves.env", "deps.precompile"], loadconfig: [&bootstrap/1]]
     ]
   end
 
@@ -29,7 +28,7 @@ defmodule NervesPruIcss.MixProject do
         build_path_link: "ti-cgt-pru",
         build_script: "build.sh",
         clean_files: ["ti-cgt-pru"],
-        archive_script: "scripts/archive.sh",
+        archive_script: "scripts/archive.sh"
       ],
       platform_config: [],
       target_tuple: :arm_unknown_linux_gnueabihf,
@@ -63,10 +62,10 @@ defmodule NervesPruIcss.MixProject do
   defp package_files do
     [
       "README.md",
-      "LICENSE"
+      "LICENSE",
       "mix.exs",
       "lib",
-      "config",
+      "config"
     ]
   end
 
